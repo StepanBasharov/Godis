@@ -9,16 +9,26 @@ import (
 	"sync"
 )
 
-func InitHttpServer(wg *sync.WaitGroup, systemStorage *storage.Storage, countInstance int) {
+func initHttpServer(wg *sync.WaitGroup, systemStorage *storage.Storage, countInstance int) {
 	// init http server connections
 	for i := 0; i < countInstance; i++ {
 		port := ":" + strconv.Itoa(8340+i)
 		httpServer := http.NewHttpServer(systemStorage, port)
 		wg.Add(1)
-		go httpServer.StartHttpServer(wg)
+		go httpServer.StartServer(wg)
 		slog.Info("INIT http server on port", "port", port)
 	}
 
+}
+
+func initTcpServer(wg *sync.WaitGroup, systemStorage *storage.Storage, countInstance int) {
+	for i := 0; i < countInstance; i++ {
+		port := ":" + strconv.Itoa(32410+i)
+		tcpServer := tcp.NewTcpServer(systemStorage, port)
+		wg.Add(1)
+		go tcpServer.StartServer(wg)
+		slog.Info("INIT tcp server on port", "port", port)
+	}
 }
 
 func main() {
@@ -28,9 +38,8 @@ func main() {
 	var systemMap sync.Map
 	systemStorage := storage.NewStorage(&systemMap)
 	// init http server
-	//InitHttpServer(&wg, &systemStorage, 10)
-	tcpServer := tcp.NewTcpServer(&systemStorage, ":32413")
-	wg.Add(1)
-	tcpServer.StartHttpServer(&wg)
+	initHttpServer(&wg, &systemStorage, 10)
+	initTcpServer(&wg, &systemStorage, 10)
 	wg.Wait()
+
 }

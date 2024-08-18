@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"godis/internal/storage"
+	"log/slog"
 	"net"
 )
 
@@ -32,7 +33,7 @@ func HandleConnection(conn net.Conn, s *storage.Storage) {
 			break
 		}
 		if string(buf[0:3]) == "set" {
-			command := parseBytesToSlice(buf)
+			command := parseBytesToSlice(buf[0:n])
 			if len(command) != 3 {
 				return
 			} else {
@@ -40,16 +41,24 @@ func HandleConnection(conn net.Conn, s *storage.Storage) {
 				if err != nil {
 					return
 				}
+				_, err = conn.Write([]byte("OK"))
+				if err != nil {
+					slog.Error("Can't write data")
+					return
+				}
 			}
 		} else if string(buf[0:3]) == "get" {
-			command := parseBytesToSlice(buf)
+			command := parseBytesToSlice(buf[0:n])
 			if len(command) != 2 {
 				return
 			} else {
-				fmt.Println(command[1])
 				data := s.Get(command[1])
-				// conn.Write([]byte(data))
-				fmt.Println(data)
+				bytesData := []byte(fmt.Sprint("", data))
+				_, err = conn.Write(bytesData)
+				if err != nil {
+					slog.Error("Can't write data")
+					return
+				}
 			}
 		}
 	}

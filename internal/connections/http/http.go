@@ -19,7 +19,7 @@ func NewHttpServer(s *storage.Storage, port string) ServerHTTP {
 	return ServerHTTP{engine, port}
 }
 
-func (s *ServerHTTP) StartHttpServer(wg *sync.WaitGroup) {
+func (s *ServerHTTP) StartServer(wg *sync.WaitGroup) {
 	defer wg.Done()
 	gin.SetMode(gin.ReleaseMode)
 	s.engine.Run(s.port)

@@ -17,7 +17,7 @@ func NewTcpServer(s *storage.Storage, port string) ServerTCP {
 	return ServerTCP{storageMap: s, port: port}
 }
 
-func (s *ServerTCP) StartHttpServer(wg *sync.WaitGroup) {
+func (s *ServerTCP) StartServer(wg *sync.WaitGroup) {
 	defer wg.Done()
 	slog.Info("Tcp server started", "port", s.port)
 	server, err := net.Listen("tcp", s.port)

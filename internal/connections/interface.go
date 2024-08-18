@@ -5,5 +5,5 @@ import (
 )
 
 type Server interface {
-	StartHttpServer(wg *sync.WaitGroup)
+	StartServer(wg *sync.WaitGroup)
 }
