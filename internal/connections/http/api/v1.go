@@ -8,7 +8,7 @@ import (
 
 func SetupApi(engine *gin.Engine, storage *storage.Storage) {
 	// storage api
-	storageApi := engine.Group("/storage")
+	storageApi := engine.Group("/v1/storage")
 	storageApi.POST("/set", func(context *gin.Context) {
 		handlers.StoreHandlerSet(context, storage)
 	})

@@ -7,20 +7,20 @@ import (
 	"sync"
 )
 
-type Server struct {
-	engine  *gin.Engine
-	storage *storage.Storage
+type ServerHTTP struct {
+	engine *gin.Engine
+	port   string
 }
 
-func NewHttpServer(s *storage.Storage) Server {
+func NewHttpServer(s *storage.Storage, port string) ServerHTTP {
 	engine := gin.Default()
 	api.SetupApi(engine, s)
 
-	return Server{engine, s}
+	return ServerHTTP{engine, port}
 }
 
-func (s *Server) StartHttpServer(wg *sync.WaitGroup, port string) {
+func (s *ServerHTTP) StartHttpServer(wg *sync.WaitGroup) {
 	defer wg.Done()
 	gin.SetMode(gin.ReleaseMode)
-	s.engine.Run(port)
+	s.engine.Run(s.port)
 }

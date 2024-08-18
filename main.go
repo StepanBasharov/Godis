@@ -2,6 +2,7 @@ package main
 
 import (
 	"godis/internal/connections/http"
+	"godis/internal/connections/tcp"
 	"godis/internal/storage"
 	"log/slog"
 	"strconv"
@@ -11,11 +12,11 @@ import (
 func InitHttpServer(wg *sync.WaitGroup, systemStorage *storage.Storage, countInstance int) {
 	// init http server connections
 	for i := 0; i < countInstance; i++ {
-		httpServer := http.NewHttpServer(systemStorage)
-		wg.Add(1)
 		port := ":" + strconv.Itoa(8340+i)
-		go httpServer.StartHttpServer(wg, port)
-		slog.Info("INIT http server on port %s", port)
+		httpServer := http.NewHttpServer(systemStorage, port)
+		wg.Add(1)
+		go httpServer.StartHttpServer(wg)
+		slog.Info("INIT http server on port", "port", port)
 	}
 
 }
@@ -27,6 +28,9 @@ func main() {
 	var systemMap sync.Map
 	systemStorage := storage.NewStorage(&systemMap)
 	// init http server
-	InitHttpServer(&wg, &systemStorage, 10)
+	//InitHttpServer(&wg, &systemStorage, 10)
+	tcpServer := tcp.NewTcpServer(&systemStorage, ":32413")
+	wg.Add(1)
+	tcpServer.StartHttpServer(&wg)
 	wg.Wait()
 }

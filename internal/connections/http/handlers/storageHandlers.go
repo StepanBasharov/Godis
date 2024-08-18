@@ -14,7 +14,10 @@ func StoreHandlerSet(ctx *gin.Context, storage *storage.Storage) {
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	storage.Set(content.Key, content.Val)
+	err := storage.Set(content.Key, content.Val)
+	if err != nil {
+		ctx.String(http.StatusInternalServerError, "ERROR")
+	}
 
 	ctx.String(http.StatusOK, "OK")
 }
